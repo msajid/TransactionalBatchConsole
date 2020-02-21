@@ -25,14 +25,15 @@ namespace TransactionalBatchConsole
 
                 var container = cosmosContainer.Container;
 
-              
-                var batch = container.CreateTransactionalBatch(new PartitionKey("12345-frozen2"));
+                var ticket1 = new ShowBooking() { id = "13", PartitionKey = "12345-frozen2" };
+                var ticket2 = new ShowBooking() { id = "14", PartitionKey = "12345-frozen2" };
+                var ticket3 = new ShowBooking() { id = "15", PartitionKey = "12345-frozen2" };
 
-                for (int i = 0; i < 105; i++)
-                {
-                    var ticket = new ShowBooking() { id = "1" + i , PartitionKey = "12345-frozen2" };
-                    batch.CreateItem(ticket);
-                }
+                var batch = container
+                            .CreateTransactionalBatch(new PartitionKey("12345-frozen2"))
+                            .CreateItem(ticket1)
+                            .CreateItem(ticket2)
+                            .CreateItem(ticket3);
 
                 var transactionResult = await batch.ExecuteAsync();
 
